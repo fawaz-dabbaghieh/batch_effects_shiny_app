@@ -1,0 +1,27 @@
+﻿<style>
+div.a {
+    line-height: 1.5;
+    font-size: 15px;
+	font-family: Arial, Helvetica, sans-serif
+	text-align: justify;
+}
+</style>
+
+<h1>Listing Experiments</h1>
+<div class = "a">
+<p>First, users need to log in from the top right corner</p>
+<ul>
+<li>Using the <code>anonymous_key</code> if they wanted to log in anonymously.</li>
+<li>Using their respective user_key if they were registered with DeepBlue, or can <a href="http://deepblue.mpi-inf.mpg.de/register.php" target="_blank" rel="noopener">register</a> with the DeepBlue web server and receive a user_key.</li>
+</ul>
+<p>After logging in, users can choose a genome from the dropdown list, the projects dropdown list reacts to the genome the users chose, then only shows you projects that have data related to the chosen genome. The "Data Type" dropdown list has "gene expression" and epigenetic marks, and users can choose which kind of data type they would like to list experiments for. The "Filter Coverage files" checkbox is for the DEEP project, as some of the experiments retrieved are the coverage files which are used as control and users can filter them out.</p>
+<p>Once the user lists the experiments, on the right bottom corner, notifications appear telling the user which step of the listing process is being performed, this step might take a while depending on the number of experiments that need to be retrieved.</p>
+<p>The output is a table with IDs and Names of experiments, the IDs can be clicked on to see the metadata. Both the experiments table and metadata table are searchable using case-sensitive strings or regular expression, e.g. 51_Hf0[34] will show the user experiments starting with 51_Hf03 and 51_Hf04.</p>
+<p>Some of the functions used in this panel:</p>
+<ol>
+<li><code><a href="http://deepblue.mpi-inf.mpg.de/api.php#api-list_experiments" target="_blank">list_experiments</a></code></li>
+<li><code><a href="http://deepblue.mpi-inf.mpg.de/api.php#api-list_genomes" target="_blank">list_genomes</a></code></code></li>
+<li><code><a href="http://deepblue.mpi-inf.mpg.de/api.php#api-list_projects" target="_blank">list_projects</a></code></li>
+<li><code><a href="http://deepblue.mpi-inf.mpg.de/api.php#api-info" target="_blank">info</a></code></li>
+</ol>
+</div>

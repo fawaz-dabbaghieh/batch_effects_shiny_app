@@ -1,0 +1,53 @@
+﻿<style>
+div.a {
+    line-height: 1.5;
+    font-size: 15px;
+	font-family: Arial, Helvetica, sans-serif
+	text-align: justify;
+}
+</style>
+
+<h1>Batch Effect</h1>
+<div class="a">
+<p style="text-align: justify;">This is the most important panel in this app, which allows the user to run several batch analysis functions and models on the matrix retrieved from before.</p>
+<p>Left Panel:</p>
+<ul>
+<li style="text-align: justify;"><strong>Outliers selection:</strong> User can select specific experiments as outliers to be excluded from the matrix before running the batch effect, the user can assess outliers from the PCA plot and decide on any specific outliers.</li>
+<li style="text-align: justify;"><strong>Pie chart:</strong> This button gives the user a popup panel containing a list of features from the metadata and an interactive pie chart, this will help the user see the distribution of the levels for each feature (e.g. if the user chooses biosource_name the pie chart will show the percentages of each biosource name).</li>
+<li style="text-align: justify;"><strong>Batch Corrected Matrices:</strong> This list will contain the batch adjusted matrices, every time the user runs a test, a new matrix is added to this list and the user can switch between different matrices. Depending on the current matrix chosen, this matrix will be the working matrix for downloading and plotting later.</li>
+</ul>
+<p>Let's discuss a bit about the different batch effect analysis methods that can be used here.</p>
+<ol>
+<li style="text-align: justify;"><strong><a href="https://www.bioconductor.org/packages/3.7/bioc/vignettes/sva/inst/doc/sva.pdf" target="_blank" rel="noopener">ComBat</a>:</strong> Is a method for adjusting for known batches and uses an empirical Bayesian framework [<a href="https://www.ncbi.nlm.nih.gov/pubmed/16632515" target="_blank" rel="noopener">1</a>]. The basic idea is that the user needs to choose one of the features from the metadata as a batch (e.g. BATCH, BIOMATERIAL_PROVIDER...) anything that might cause non-biological variety in the data, ComBat then needs a model matrix with (optionally) the adjustment variable and variables of interest.<br />
+<pre>    batch_adjusted_matrix &lt;- ComBat(dat=data_matrix,
+                                    batch=as.factor(metadata[,batch]),
+                                    mod=model_matrix,
+                                    par.prior=TRUE, prior.plots=FALSE)</pre>
+</li>
+<li style="text-align: justify;"><strong><a href="https://www.bioconductor.org/packages/3.7/bioc/vignettes/sva/inst/doc/sva.pdf" target="_blank" rel="noopener">SVA</a>:</strong> This method has two steps. First, it calculates the number of latent variables that need to be estimated, then it estimates the surrogate variables. This method needs two model matrices, the null model that has only the adjustment variable (optional) otherwise has only the intercept, the full model containing both adjustment and interest variables.<br />the SVA function will return a list with 4 components, we use the first component which is a matrix with columns as the estimated surrogate variables and can be used -with some math magic- to remove the batch effect from the raw matrix.
+<pre>mod &lt;- model.matrix(~as.factor(variable_of_interest), data=pheno)
+mod0 &lt;- model.matrix(~1,data=pheno)
+n.sv &lt;- num.sv(edata,mod,method="leek")
+svobj &lt; sva(edata,mod,mod0,n.sv=n.sv)
+</pre>
+</li>
+<li style="text-align: justify;"><strong><a href="https://www.bioconductor.org/packages/3.7/bioc/vignettes/sva/inst/doc/sva.pdf" target="_blank" rel="noopener">Supervised SVA</a>:</strong> In this method, SVA uses a control probe to estimate the surrogate variables, the controls here are a vector of probabilities (between 0 and 1) indicating that a gene is a control (a value of 1 means the gene is certainly a control and a value of 0 means the gene is certainly not a control), these are calculated mathematically from the matrix:
+<pre>ranked_data &lt;- apply(data_matrix, 2,rank)
+std_ranks &lt;- apply(ranked_data,1,sd)
+ranks_of_std &lt;- rank(std_ranks)
+control_probe &lt;- 1-(rankes_of_std / max(rank_of_std))</pre>
+Just live SVA, this method needs a null model matrix and a full model matrix along with the control probe, and it will return similar list with 4 components and we use the first component to remove the batch effect from the raw matrix.</li>
+<li style="text-align: justify;"><strong><a href="https://www.bioconductor.org/packages/release/bioc/vignettes/RUVnormalize/inst/doc/RUVnormalize.pdf" target="_blank" rel="noopener">RUV</a>:</strong> This method is used to normalize expression data and is meant to remove unwanted variation from the data when the interest variable is not known. Once the user chooses this method, option related to RUV appear on the right panel:
+<ul style="list-style-type: circle;">
+<li style="text-align: justify;"><strong>nu.coeff:</strong> which is the regularization parameter of the unwanted variation, and should be inversely proportional to the (expected) magnitude of the unwanted variation.</li>
+<li style="text-align: justify;"><strong>Desired rank (K):</strong> quoting from the RUV manual "the rank k can be thought of as the number of independent sources of unwanted variation in the data (i.e., if one source is a linear combination of other sources, it does not increase the rank)".</li>
+<li style="text-align: justify;"><strong>House Keeping Genes:</strong> The predefined list can only be used with gene expression data, as DeepBlue server gives back the matrix with gene names in columns that can be matched to the predefined list and given to the RUV function. But can be estimated mathematically by a rank analysis:
+<pre>ranked_data &lt;- apply(data_matrix, 2,rank)
+std_ranks &lt;- apply(ranked_data,1,sd)
+mean_ranks &lt;- apply(ranked_data,1,mean)
+house_keeping_genes &lt;- names(mean_ranks[std_ranks &lt;= quantile(std_ranks,quantile_prob)])</pre>
+</li>
+</ul>
+More references on the RUV package can be found on the <a href="https://academic.oup.com/biostatistics/article/17/1/16/1744198" target="_blank" rel="noopener">original paper</a> and the <a href="https://www.bioconductor.org/packages/release/bioc/manuals/RUVnormalize/man/RUVnormalize.pdf" target="_blank" rel="noopener">package manual</a>.</li>
+</ol>
+Each batch corrected matrix can be downloaded along with its metadata with the download button that appears on the right panel after running one of the methods successfully, the selected matrix from the "Batch Corrected Matrices" list is the one that will be downloaded and can be read the same way described in "Score Matrix" tab help page.</div>

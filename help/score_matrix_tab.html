@@ -1,0 +1,29 @@
+﻿<style>
+div.a {
+    line-height: 1.5;
+    font-size: 15px;
+	font-family: Arial, Helvetica, sans-serif -->
+}
+</style>
+
+<h1>Score Matrix</h1>
+<div class="a">
+<p style="text-align: justify;">After selecting the experiments from the previous tab, the user can build a <abbr title="Columns as experiments, rows as regions">score matrix</abbr> using one of two methods from the left box:</p>
+<ol>
+<li style="text-align: justify;"><strong><a href="http://deepblue.mpi-inf.mpg.de/api.php#api-tiling_regions" target="_blank" rel="noopener">Tiling Regions</a></strong>: User can then select the size of the tiling regions, whether 1 kb or 5 kb.</li>
+<li style="text-align: justify;"><strong><a href="http://deepblue.mpi-inf.mpg.de/api.php#api-list_annotations" target="_blank" rel="noopener">List of annotation</a></strong>: User can then select an annotation related to the genome selected from the annotations list that appears if "Annotations" was chosen.</li>
+</ol>
+<p style="text-align: justify;">The user can select one or multiple chromosomes which are parsed to the function to calculate the matrix. If the user is trying to test some functionalities of the app, <span style="text-decoration: underline;">we advise</span>&nbsp;choosing one chromosome, because the time for calculating the whole genome is proportional to the number of regions to be calculated and the size of chromosome or&nbsp;genome.</p>
+<p>On the right panel, there are two advanced options:</p>
+<ol>
+<li style="text-align: justify;"><strong>Aggregation function</strong>: which is the method used to aggregate the score for a region on the chromosome, this is needed for the <a href="http://deepblue.mpi-inf.mpg.de/api.php#api-score_matrix" target="_blank" rel="noopener"><code>deepblue_score_matrix</code></a>&nbsp;function that will build the matrix on the DeepBlue server.</li>
+<li style="text-align: justify;"><strong>Filtering method</strong>: Once the matrix is retrieved, the user can filter either by removing all non-complete rows (i.e. rows that have NA for one or more of the experiments), or removing rows with user-defined cutoff, the cutoff is calculated as
+<pre><code>(Number of NAs<sub>row</sub> ∕ Number of columns) &lt; variation cutoff</code></pre>
+and only those rows are kept. Example:
+<pre>number of columns is 50, Number of NAs<sub>row15</sub> is 2, and cutoff is 0.5<br />2/50 = 0.4 &lt; 0.5<br />and this row is not filtered-out</pre>
+</li>
+</ol>
+<p style="text-align: justify;">After the matrix been calculated and downloaded from the server, a "Download Data" button will appear on the&nbsp;right panel, and&nbsp;the&nbsp;user can download the&nbsp;raw matrix and&nbsp;metadata as .tsv files, and the user can then use them for any further analysis with&nbsp;other tools. Both files can be&nbsp;read&nbsp;with R easily using the following&nbsp;code:</p>
+<pre>metadata &lt;- read.table("filepath/matrix_metadata.tsv", header = T, stringsAsFactors = F)<br />
+data_matrix &lt;- as.matrix(read.table("filepath/data_matrix.tsv", header = T))</pre>
+</div>
